@@ -26,45 +26,34 @@ def is_valid(board, current, pos: tuple) -> bool:
         neighbours.append(board[y][x - 1])
 
     # diagonals
-    # if (
-    #     y < len(board) - 1
-    #     and x < len(board) - 1
-    #     and board[y + 1][x + 1] != TILES.empty
-    #     and check_neighbors(current, board[y + 1][x + 1])
-    # ):
-    #     return False
-    # if (
-    #     y < len(board) - 1
-    #     and x > 0
-    #     and board[y + 1][x - 1] != TILES.empty
-    #     and check_neighbors(current, board[y + 1][x - 1])
-    # ):
-    #     return False
+    if y < len(board) - 1 and x < len(board) - 1:
+        neighbours.append(board[y + 1][x + 1])
 
-    # if (
-    #     y > 0
-    #     and x < len(board) - 1
-    #     and board[y - 1][x + 1] != TILES.empty
-    #     and check_neighbors(current, board[y - 1][x + 1])
-    # ):
-    #     return False
-    # if (
-    #     y > 0
-    #     and x > 0
-    #     and board[y - 1][x - 1] != TILES.empty
-    #     and check_neighbors(current, board[y - 1][x - 1])
-    # ):
-    #     return False
+    if y < len(board) - 1 and x > 0:
+        neighbours.append(board[y + 1][x - 1])
+
+    if y > 0 and x < len(board) - 1:
+        neighbours.append(board[y - 1][x + 1])
+
+    if y > 0 and x > 0:
+        neighbours.append(board[y - 1][x - 1])
 
     options = neighbour_map[current]
-
+    # check that no neighbours are banned
     for neighbour in neighbours:
         if neighbour not in options and neighbour != TILES.empty:
             return False
 
     empty_count = neighbours.count(TILES.empty)
-    for tile, count in options.items():
-        if neighbours.count(tile) + empty_count >= count:
+
+    # check that no neighbours exceed the maximum required count
+    for tile, count_range in options.items():
+        if neighbours.count(tile) + empty_count > count_range[1]:
+            return False
+
+    # check that neighbours meet minimum requirements
+    for tile, count_range in options.items():
+        if neighbours.count(tile) + empty_count >= count_range[0]:
             return True
 
     return False

@@ -25,10 +25,9 @@ def print_board(board):
 def main():
     sys.setrecursionlimit(4096)
     size = 46
-    print("test")
 
     board = generate_board(size)
-    print("test")
+
     scale = int(600 / size)
 
     pygame.init()
