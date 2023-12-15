@@ -1,3 +1,4 @@
+import random
 import sys
 import pygame
 
@@ -23,8 +24,8 @@ def print_board(board):
 
 
 def main():
-    sys.setrecursionlimit(4096)
-    size = 100
+    random.seed(1)
+    size = 300
     print("Starting!")
 
     board = generate_board(size)

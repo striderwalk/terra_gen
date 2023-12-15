@@ -64,8 +64,10 @@ def solve(board) -> bool:
     stack.append(board)
 
     while stack:
+        if len(stack) > 64:
+            stack.pop(0)
         current_board = stack.pop()
-        # print_board(board)
+
         pos = find_emtpy(current_board)
         if pos:
             i, j = pos
