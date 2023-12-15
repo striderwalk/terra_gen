@@ -60,33 +60,36 @@ def is_valid(board, current, pos: tuple) -> bool:
 
 
 def solve(board) -> bool:
-    # print_board(board)
-    pos = find_emtpy(board)
-    if pos:
-        i, j = pos
+    stack = []
+    stack.append(board)
 
-    else:
-        return True
+    while stack:
+        current_board = stack.pop()
+        # print_board(board)
+        pos = find_emtpy(current_board)
+        if pos:
+            i, j = pos
 
-    tile_list = list(TILES)
-    tile_list.remove(TILES.empty)
-    random.shuffle(tile_list)
+        else:
+            return current_board
 
-    for num in tile_list:
-        if is_valid(board, num, (i, j)):
-            board[i][j] = num
+        tile_list = list(TILES)
+        tile_list.remove(TILES.empty)
+        random.shuffle(tile_list)
 
-            if solve(board):
-                return True
-            board[i][j] = TILES.empty
+        for num in tile_list:
+            if is_valid(current_board, num, (i, j)):
+                new_board = [row[:] for row in current_board]
+                new_board[i][j] = num
+                stack.append(new_board)
 
     return False
 
 
 def generate_board(size):
     board = [[TILES.empty for _ in range(size)] for _ in range(size)]
-    if solve(board):
-        return board
+    if current_board := solve(board):
+        return current_board
     else:
         print(*board, sep="\n")
         raise RuntimeError("Could not generate board")
