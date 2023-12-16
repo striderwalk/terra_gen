@@ -1,6 +1,7 @@
 import random
 import sys
 import pygame
+from consts import SIZE
 
 from generator import generate_board, solve
 from tiles import COLOURS, TILES
@@ -24,32 +25,37 @@ def print_board(board):
 
 
 def main():
-    random.seed(1)
-    size = 300
     print("Starting!")
 
-    board = generate_board(size)
+    board = generate_board(SIZE)
     print("Done!")
-    scale = int(600 / size)
+    scale = int(600 / SIZE)
 
     pygame.init()
 
     win = pygame.display.set_mode((600, 600))
 
     while True:
-        for i in range(len(board)):
-            for j in range(len(board[i])):
-                pygame.draw.rect(
-                    win,
-                    COLOURS[board[i][j]],
-                    (i * scale, j * scale, scale, scale),
-                )
+        # get the board
+        try:
+            _update = next(board)
+            update = _update
+        except StopIteration:
+            pass
+        # draw the board
+        (i, j), tile = update
+        pygame.draw.rect(
+            win,
+            COLOURS[tile],
+            (i * scale, j * scale, scale, scale),
+        )
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                board = generate_board(size)
+                board = generate_board(SIZE)
+                win.fill((0, 0, 0))
 
         pygame.display.update()
 

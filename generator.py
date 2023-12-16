@@ -1,13 +1,29 @@
+from functools import cache
 import random
+
+import numpy as np
+from consts import SIZE
 
 from tiles import TILES, neighbour_map
 
 
-def find_emtpy(board) -> list:
-    for i in range(len(board)):
-        for j in range(len(board[i])):
-            if board[i][j] == TILES.empty:
-                return (i, j)
+@cache
+def indices_order(size):
+    array = np.array([[(i, j) for i in range(size)] for j in range(size)])
+
+    indices = []
+    while len(array):
+        indices.extend(array[0])
+        array = array[1:]
+        array = np.rot90(array)
+    return indices
+
+
+def find_emtpy(board, indices) -> list:
+    for index, (j, i) in enumerate(indices):  # indices_order(len(board)):
+        if board[i][j] == TILES.empty:
+            # indices.pop(index)
+            return (i, j)
 
 
 def is_valid(board, current, pos: tuple) -> bool:
@@ -26,17 +42,17 @@ def is_valid(board, current, pos: tuple) -> bool:
         neighbours.append(board[y][x - 1])
 
     # diagonals
-    if y < len(board) - 1 and x < len(board) - 1:
-        neighbours.append(board[y + 1][x + 1])
+    # if y < len(board) - 1 and x < len(board) - 1:
+    #     neighbours.append(board[y + 1][x + 1])
 
-    if y < len(board) - 1 and x > 0:
-        neighbours.append(board[y + 1][x - 1])
+    # if y < len(board) - 1 and x > 0:
+    #     neighbours.append(board[y + 1][x - 1])
 
-    if y > 0 and x < len(board) - 1:
-        neighbours.append(board[y - 1][x + 1])
+    # if y > 0 and x < len(board) - 1:
+    #     neighbours.append(board[y - 1][x + 1])
 
-    if y > 0 and x > 0:
-        neighbours.append(board[y - 1][x - 1])
+    # if y > 0 and x > 0:
+    #     neighbours.append(board[y - 1][x - 1])
 
     options = neighbour_map[current]
     # check that no neighbours are banned
@@ -60,15 +76,17 @@ def is_valid(board, current, pos: tuple) -> bool:
 
 
 def solve(board) -> bool:
+    indices = list(indices_order(SIZE))[::-1]
+
     stack = []
     stack.append(board)
 
     while stack:
-        if len(stack) > 64:
+        if len(stack) > 128:
             stack.pop(0)
         current_board = stack.pop()
 
-        pos = find_emtpy(current_board)
+        pos = find_emtpy(current_board, indices)
         if pos:
             i, j = pos
 
@@ -83,6 +101,7 @@ def solve(board) -> bool:
             if is_valid(current_board, num, (i, j)):
                 new_board = [row[:] for row in current_board]
                 new_board[i][j] = num
+                yield (i, j), num
                 stack.append(new_board)
 
     return False
@@ -90,8 +109,5 @@ def solve(board) -> bool:
 
 def generate_board(size):
     board = [[TILES.empty for _ in range(size)] for _ in range(size)]
-    if current_board := solve(board):
-        return current_board
-    else:
-        print(*board, sep="\n")
-        raise RuntimeError("Could not generate board")
+    for i in solve(board):
+        yield i
