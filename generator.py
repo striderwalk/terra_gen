@@ -19,11 +19,11 @@ def indices_order(size):
     return indices
 
 
-def find_emtpy(board, indices) -> list:
-    for index, (j, i) in enumerate(indices):  # indices_order(len(board)):
+def find_emtpy(board, indices, start_index) -> list:
+    for index, (j, i) in enumerate(indices[start_index:]):  # indices_order(len(board)):
         if board[i][j] == TILES.empty:
-            # indices.pop(index)
-            return (i, j)
+            return (i, j), index
+    return None, index
 
 
 def is_valid(board, current, pos: tuple) -> bool:
@@ -68,15 +68,17 @@ def is_valid(board, current, pos: tuple) -> bool:
             return False
 
     # check that neighbours meet minimum requirements
+    possible = False
     for tile, count_range in options.items():
         if neighbours.count(tile) + empty_count >= count_range[0]:
-            return True
+            possible = True
 
-    return False
+    return possible
 
 
 def solve(board) -> bool:
     indices = list(indices_order(SIZE))[::-1]
+    start_index = 0
 
     stack = []
     stack.append(board)
@@ -86,7 +88,7 @@ def solve(board) -> bool:
             stack.pop(0)
         current_board = stack.pop()
 
-        pos = find_emtpy(current_board, indices)
+        pos, start_index = find_emtpy(current_board, indices, start_index)
         if pos:
             i, j = pos
 
@@ -95,6 +97,8 @@ def solve(board) -> bool:
 
         tile_list = list(TILES)
         tile_list.remove(TILES.empty)
+        tile_list.append(TILES.water)
+
         random.shuffle(tile_list)
 
         for num in tile_list:
@@ -109,5 +113,10 @@ def solve(board) -> bool:
 
 def generate_board(size):
     board = [[TILES.empty for _ in range(size)] for _ in range(size)]
+    # for _ in range(3):
+    #     i = random.randint(0, size - 1)
+    #     j = random.randint(0, size - 1)
+    #     board[i][j] = random.choice(list(TILES))
+
     for i in solve(board):
         yield i

@@ -21,12 +21,12 @@ neighbour_map = {
         TILES.shallow_water: (3, MAX),
     },
     TILES.shallow_water: {
-        TILES.water: (2, MAX),
+        TILES.water: (0, MAX),
         TILES.sand: (1, 3),
         TILES.shallow_water: (3, MAX),
     },
     TILES.sand: {
-        TILES.shallow_water: (1, MAX),
+        TILES.shallow_water: (0, 4),
         TILES.sand: (1, MAX),
         TILES.grass: (1, 3),
     },

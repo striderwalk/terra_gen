@@ -28,7 +28,7 @@ def main():
     print("Starting!")
 
     board = generate_board(SIZE)
-    print("Done!")
+
     scale = int(600 / SIZE)
 
     pygame.init()
